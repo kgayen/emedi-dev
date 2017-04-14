@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry excluding="resources/JS/bootstrap-datetimepicker.min.js|resources/JS/dataTables.bootstrap.js|resources/JS/dataTables.bootstrap.min.js|resources/JS/jquery-1.12.0.min.js|resources/JS/jquery-1.8.3.min.js|resources/JS/jquery-jvectormap-1.2.2.min.js|resources/JS/jquery-ui-1.10.4.min.js|resources/JS/jquery-ui-1.9.2.custom.min.js|resources/JS/jquery.dataTables.js|resources/JS/jquery.dataTables.min.js|resources/JS/jquery.min.js|resources/JS/jquery.sparkline.js|resources/JS/jquery.tagsinput.js|resources/JS/moment.js|resources/JS/sparklines.js|resources/assets/|resources/assets/jquery-file-upload/js/|resources/assets/jquery-file-upload/server/node/server.js|resources/assets/jquery-ui/jquery-ui-1.10.1.custom.min.css|resources/assets/jquery-ui/jquery-ui-1.9.2.custom.min.js|resources/assets/morris.js-0.4.3/raphael-min.js" kind="src" path="WebContent"/>
+	<classpathentry kind="con" path="org.eclipse.wst.jsdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.wst.jsdt.launching.WebProject">
+		<attributes>
+			<attribute name="hide" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.wst.jsdt.launching.baseBrowserLibrary"/>
+	<classpathentry kind="output" path=""/>
+</classpath>

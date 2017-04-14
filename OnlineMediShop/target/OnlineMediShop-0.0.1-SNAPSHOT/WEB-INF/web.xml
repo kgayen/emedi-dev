@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
+	<display-name>OnlineMediShop</display-name>
+<!--     <listener> -->
+<!-- 		<listener-class>com.application.listener.PropertiesListener</listener-class> -->
+<!-- 	</listener> -->
+<!-- 	<listener> -->
+<!--         <listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class> -->
+<!--     </listener> -->
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	
+<!-- 	<filter> -->
+<!-- 		<filter-name>springSecurityFilterChain</filter-name> -->
+<!-- 		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class> -->
+<!-- 	</filter> -->
+<!-- 	<filter-mapping> -->
+<!-- 		<filter-name>springSecurityFilterChain</filter-name> -->
+<!-- 		<url-pattern>/orderservice/*</url-pattern> -->
+<!-- 	</filter-mapping> -->
+	<filter>
+		<filter-name>springRestSecurity</filter-name>
+		<filter-class>com.application.filter.RestServiceFilter</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>springRestSecurity</filter-name>
+		<url-pattern>/orderservice/*</url-pattern>
+	</filter-mapping>	
+	<servlet>
+		<servlet-name>onlinemedishop</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>onlinemedishop</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+	
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>/WEB-INF/onlinemedishop-servlet.xml,/WEB-INF/applicationService.xml,/WEB-INF/smsapplication.xml,/WEB-INF/emailConfiguration.xml</param-value>
+<!-- 		,/WEB-INF/applicationService.xml,/WEB-INF/spring-security.xml,/WEB-INF/spring-security.xml,/WEB-INF/application-security.xml -->
+	</context-param>
+</web-app>

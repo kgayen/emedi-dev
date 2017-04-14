@@ -1,0 +1,118 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+		xmlns:context="http://www.springframework.org/schema/context"
+		xmlns:mvc="http://www.springframework.org/schema/mvc"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/mvc
+		http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+
+	<!-- <context:exclude-filter type="regex" expression="com.rimoart.controller.Hello.*" /> -->
+<!-- 	<context:component-scan base-package="com.rimoart.controller"/> -->
+<!-- 	<context:component-scan base-package="com.application.controller"/> -->
+<!-- 	<context:component-scan base-package="com.application.controller"/> -->
+	<mvc:annotation-driven />
+	
+	<mvc:interceptors>
+	    <mvc:interceptor>
+	        <mvc:mapping path="/retail/*"/>
+	        <bean class="com.application.filter.RetailFilter"></bean>
+	    </mvc:interceptor>
+	    <mvc:interceptor>
+	        <mvc:mapping path="/user/*"/>
+	        <bean class="com.application.filter.UserActionFilter"></bean>
+	    </mvc:interceptor>
+	    <mvc:interceptor>
+	        <mvc:mapping path="/seller/*"/>
+	        <bean class="com.application.filter.UserActionFilter"></bean>
+	    </mvc:interceptor>
+	    <mvc:interceptor>
+	        <mvc:mapping path="/order/*"/>
+	        <bean class="com.application.filter.OrderFilter"></bean>
+	    </mvc:interceptor>
+	    <mvc:interceptor>
+	        <mvc:mapping path="/orderservice/*"/>
+	        <bean class="com.application.filter.OrderRestFilter"></bean>
+	    </mvc:interceptor>
+	    <mvc:interceptor>
+	        <mvc:mapping path="/selleractivity/*"/>
+	        <bean class="com.application.filter.SellerActivityFilter"></bean>
+	    </mvc:interceptor>
+	    <mvc:interceptor>
+	        <mvc:mapping path="/sellerrestservice/*"/>
+	        <bean class="com.application.filter.SellerActivityFilter"></bean>
+	    </mvc:interceptor>
+	    <mvc:interceptor>
+	        <mvc:mapping path="/adminactivity/*"/>
+	        <bean class="com.application.filter.AdminActivityFilter"></bean>
+	    </mvc:interceptor>
+	</mvc:interceptors>
+
+	<context:component-scan base-package="com.application.controller"/>
+	<context:component-scan base-package="com.application.restservice"/>
+	
+	<mvc:resources location="/resources/" mapping="/resources/**"/>
+	
+	<bean id="placeholderConfig" class="com.application.utility.SpringPropertiesUtil">
+	    <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
+	    <property name="locations">
+	    <list>
+	        <value>file:///D:/Drive_Project/textworkspace/OnlineMediShop/build/classes/errorTable.properties</value>
+	        <value>file:///D:/Drive_Project/textworkspace/OnlineMediShop/build/classes/notification.properties</value>
+	        <value>file:///D:/Drive_Project/textworkspace/OnlineMediShop/build/classes/tablename.properties</value>
+	        <value>file:///D:/Drive_Project/textworkspace/OnlineMediShop/build/classes/loggeractivity.properties</value>
+	        <value>file:///D:/Drive_Project/textworkspace/OnlineMediShop/build/classes/application.properties</value>
+	        <value>file:///D:/Drive_Project/textworkspace/OnlineMediShop/build/classes/SMS.properties</value>
+	        
+	        
+<!-- 	        <value>file:///opt/shared/configuration/medishopproperties/errorTable.properties</value> -->
+<!-- 	        <value>file:///opt/shared/configuration/medishopproperties/notification.properties</value> -->
+<!-- 	        <value>file:///opt/shared/configuration/medishopproperties/tablename.properties</value> -->
+<!-- 	        <value>file:///opt/shared/configuration/medishopproperties/loggeractivity.properties</value> -->
+<!-- 	        <value>file:///opt/shared/configuration/medishopproperties/application.properties</value> -->
+<!-- 			<value>file:///opt/shared/configuration/medishopproperties/SMS.properties</value> -->
+	    </list>
+	    </property>
+	</bean>
+	
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/JSP/"></property>
+		<property name="suffix" value=".jsp"></property>
+	</bean>
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize" value="10255000258000" />
+	</bean>
+	<bean name="orderStatus" class="com.application.model.OrderStatus"/>
+	<bean name="notification" class="com.application.model.Notification"/>
+	<bean name="newOrder" class="com.application.model.Order"/>
+	<bean name="user" class="com.application.model.User"/>
+	<bean name="seller" class="com.application.model.Seller"/>
+	<bean name="loggedActivity" class="com.application.model.LoggedActivity"/>
+	<bean name="exceptionInfo" class="com.application.model.ExceptionInfo">
+		<constructor-arg name="errorCode" value=""></constructor-arg>
+		<constructor-arg name="errorMsg" value=""></constructor-arg>
+		<constructor-arg name="className" value=""></constructor-arg>
+		<constructor-arg name="executableMethodName" value=""></constructor-arg>
+	</bean>
+	<bean id="jsonObject" class="org.json.simple.JSONObject" scope="prototype"></bean>
+	<bean name="searchRefundOrder" class="com.application.model.SearchRefundOrder"/>
+	<bean name="sdf" class="java.text.SimpleDateFormat">
+		<constructor-arg value="yyyy-MM-dd hh:mm:ss"></constructor-arg>
+	</bean>
+	<bean id="refundOrder" class="com.application.model.RefundOrder" scope="prototype"></bean>
+	<bean id="refundOrderStatus" class="com.application.model.RefundOrderStatus" scope="prototype"></bean>
+	<bean id="taxInfo" class="com.application.model.TaxInfo"></bean>
+	<bean id="smsModel" class="com.application.model.SMSModel"></bean>
+	<bean id="propertyData" class="com.application.model.PropertyData"></bean>
+	<bean id="invoice" class="com.application.model.Invoice"></bean>
+	<bean id="cashmemodetail" class="com.application.model.CashmemoDetail"></bean>
+	
+	<bean id="code128Model" class="com.itextpdf.text.pdf.Barcode128"></bean>
+	<bean id="barCodeGenerator" class="com.application.utility.BarCodeGenerator">
+		<property name="code128" ref="code128Model"></property>
+	</bean>
+	<bean id="invoiceHTML" class="com.application.utility.InvoiceHTML"></bean>
+</beans>
