@@ -7,6 +7,7 @@ com\application\service\UserService$3.class
 com\application\filter\OrderFilter.class
 com\application\filter\RetailFilter.class
 com\application\service\SMSService.class
+com\application\service\SellerService$6.class
 com\application\service\InvoiceService$1.class
 com\application\service\UserService$6.class
 com\application\model\Student.class
@@ -23,6 +24,7 @@ com\application\model\LoggedActivity.class
 com\application\utility\TaxInfoUtility$1.class
 com\application\service\OrderService$4.class
 com\application\dao\OrderDao.class
+com\application\model\SellerUpdateRequest.class
 com\application\service\OrderService$7.class
 com\application\utility\InvoiceHTML.class
 com\application\model\SearchRefundOrder.class
@@ -30,6 +32,7 @@ com\application\logger\LogActivity$1.class
 com\application\filter\AdminActivityFilter.class
 com\application\service\send_sms$1.class
 com\application\dao\UserDao1.class
+com\application\model\SellerStatisticData.class
 com\application\logger\LogActivity.class
 com\application\service\UserService$4.class
 com\application\controller\SellerActivitiesController.class
@@ -42,6 +45,7 @@ com\application\utility\Base64Converter.class
 com\application\model\PropertyData.class
 com\application\service\InvoiceService.class
 com\application\service\EmailService.class
+com\application\model\CancellationRequest.class
 com\application\utility\SpringPropertiesUtil.class
 com\application\service\SellerService$1.class
 com\application\filter\SellerActivityFilter.class
@@ -50,6 +54,7 @@ com\application\service\OrderService$10.class
 com\application\service\OrderService$5.class
 com\application\service\BaseService.class
 com\application\model\ExceptionInfo.class
+com\application\service\SellerService$7.class
 com\application\service\SMSService$1.class
 com\application\model\TaxInfo.class
 com\application\restservice\TestService.class
@@ -65,14 +70,18 @@ com\application\utility\TaxInfoUtility.class
 com\application\service\OrderService$6.class
 com\application\service\OrderService$3.class
 com\application\service\SendSMSService.class
+com\application\model\CancellationRequestSearch.class
+com\application\service\SellerService$8.class
 com\application\restservice\OrderRestController.class
 com\application\restservice\SellerRestController.class
 com\application\dao\LogActivityDao.class
 com\application\dao\SMSDao.class
 com\application\model\RefundOrderRequest.class
+com\application\service\SellerService$5.class
 com\application\dao\TestTran.class
 com\application\service\AuthenticationService$1.class
 com\application\model\OrderWrapper.class
+com\application\service\SellerService$2.class
 com\application\exception\CustomGenericException.class
 com\application\restservice\TaxController.class
 com\application\utility\PDFGenerator.class
@@ -80,6 +89,7 @@ com\application\service\OrderService$8.class
 com\application\model\Invoice.class
 com\application\service\UserService$1.class
 com\application\model\SMSModel.class
+com\application\service\SellerService$4.class
 com\application\service\OrderService$1.class
 com\application\service\UserService.class
 com\application\utility\ImageUtil.class
@@ -93,6 +103,7 @@ com\application\service\OrderService$2.class
 com\application\controller\UserActionContoller.class
 com\application\service\UserService$2.class
 com\application\model\RefundOrder.class
+com\application\service\SellerService$3.class
 com\application\dao\UserDao.class
 com\application\service\NotificationService.class
 com\application\service\OrderService$9.class

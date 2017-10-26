@@ -522,10 +522,14 @@ public class OrderService extends  BaseService implements OrderDao {
 	@SuppressWarnings("unchecked")
 	public JSONObject searchRefundOrders(final SearchRefundOrder searchRefundOrder,final User user) {
 		logger.info("Executing Method searchRefundOrders().");
+		logger.info("Executing Method searchRefundOrder(). Search Type: "+searchRefundOrder.toString());
 		StringBuffer strBuff = new StringBuffer();
 		if(user.getUser_role().equalsIgnoreCase(SpringPropertiesUtil.getProperty("user.seller"))){
 			strBuff.append("select * from medishop.refun_order as refundview,medishop.order orderview"
 					+ " where (orderview.order_seller_id = '"+user.getUser_id()+"')");
+			if(searchRefundOrder.getRefundSearchType() != null){
+				strBuff.append(" and (refundview.refund_status in ('"+TextUtils.join("','", searchRefundOrder.getRefundOrderStatusList())+"'))");
+			}
 		}
 		else if(user.getUser_role().equalsIgnoreCase(SpringPropertiesUtil.getProperty("user.customer"))){
 			strBuff.append("select * from medishop.refun_order as refundview,medishop.order orderview"
@@ -543,8 +547,10 @@ public class OrderService extends  BaseService implements OrderDao {
 			strBuff.append(" and (refundview.refund_status in ('"+TextUtils.join("','", searchRefundOrder.getRefundOrderStatusList())+"'))");
 		}
 		else if(searchRefundOrder.getRefundSearchType().equalsIgnoreCase("refundByOrderIdOtion")){
-			strBuff.append(" and refundview.refund_request_id in ("+TextUtils.join(",", searchRefundOrder.getRefundOrderIdList())+")");
+			strBuff.append(" and refundview.refund_request_id in ('"+TextUtils.join("','", searchRefundOrder.getRefundOrderIdList())+"')");
+			strBuff.append(" and (refundview.refund_status in ('"+TextUtils.join("','", searchRefundOrder.getRefundOrderStatusList())+"'))");
 		}
+		
 		
 		strBuff.append(" and orderview.order_id = refundview.order_id order by refundview.refund_initiate_time");
 		final String query=strBuff.toString();

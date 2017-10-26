@@ -101,7 +101,7 @@
 	                                      <div class="form-group ">
 	                                          <form:label for="cname" class="control-label col-lg-2" path="user_pincode">Pincode <span class="required">*</span></form:label>
 	                                          <div class="col-lg-10">
-	                                              <form:input class="form-control" id="subject" type="text" name="user_pincode" path="user_pincode" min="7" maxlength="7" required="required"/>
+	                                              <form:input class="form-control" id="subject" type="text" name="user_pincode" path="user_pincode" min="7" maxlength="7" required="required" readonly="true"/>
 	                                              <span id="pincodeerrormsg"></span>
 	                                          </div>
 	                                      </div>

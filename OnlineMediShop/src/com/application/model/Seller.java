@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+
 public class Seller implements Serializable {
 	
 	private static final long serialVersionUID = 3918828471774663250L;
@@ -25,6 +27,9 @@ public class Seller implements Serializable {
 	private String sellerMobileNo;
 	private String taxType;
 	private String taxCategory;
+	private String sellerShopCloseDay;
+	private String shopOpenTime;
+	private String shopCloseTime;
 	
 	
 	public String getTaxCategory() {
@@ -135,9 +140,29 @@ public class Seller implements Serializable {
 	public void setSellerDeliveryPrice(BigDecimal sellerDeliveryPrice) {
 		this.sellerDeliveryPrice = sellerDeliveryPrice;
 	}
+	
+	public String getSellerShopCloseDay() {
+		return sellerShopCloseDay;
+	}
+	public void setSellerShopCloseDay(String sellerShopCloseDay) {
+		this.sellerShopCloseDay = sellerShopCloseDay;
+	}
+	public String getShopOpenTime() {
+		return shopOpenTime;
+	}
+	public void setShopOpenTime(String shopOpenTime) {
+		this.shopOpenTime = shopOpenTime;
+	}
+	public String getShopCloseTime() {
+		return shopCloseTime;
+	}
+	public void setShopCloseTime(String shopCloseTime) {
+		this.shopCloseTime = shopCloseTime;
+	}
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
-		return "[SellerName: "+sellerShopName+", Seller Pincode: "+sellerDeliveryPincode+", Seller Expiry Date: "+sellerExpiryDate+", Seller Status: "+sellerStatus+"]";
+		//return "[SellerName: "+sellerShopName+", Seller Pincode: "+sellerDeliveryPincode+", Seller Expiry Date: "+sellerExpiryDate+", Seller Status: "+sellerStatus+"]";
+		return ToStringBuilder.reflectionToString(this);
 	}
 }

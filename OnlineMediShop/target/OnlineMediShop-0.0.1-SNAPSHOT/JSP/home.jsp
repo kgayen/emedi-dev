@@ -399,8 +399,8 @@
                   
                   <li class="sub-menu">
                       <a href="javascript:;" class="">
-                          <i class="icon_documents_alt"></i>
-                          <span>Customer</span>
+                          <i class="icon_profile"></i>
+                          <span>Profile</span>
                           <span class="menu-arrow arrow_carrot-right"></span>
                       </a>
                       <ul class="sub">                          

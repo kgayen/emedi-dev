@@ -202,4 +202,10 @@ public class UserActionContoller {
     public String getSellStatisticPage(HttpServletRequest req) {
 		return "sellStatistic";
     }
+	
+	
+	@RequestMapping(value = "/changesellerinfo", method = RequestMethod.GET)
+    public String getChangeSellerInfoPage(HttpServletRequest req) {
+		return "changesellerinfo";
+    }
 }

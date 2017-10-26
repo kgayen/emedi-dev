@@ -259,7 +259,7 @@
 														  </div>
 			                                          </div>
 			                                          <div class="modal-footer">
-			                                              <button class="btn btn-success" type="button" data-dismiss="modal" id="refundorderSearchByAdvance">Search</button>
+			                                              <button class="btn btn-success" type="button" data-dismiss="modal" id="refundorderSearchByAdvance" value="CustomerSearch">Search</button>
 			                                              <button class="btn btn-default" type="reset" >Reset</button>
 			                                              <button class="btn btn-default" type="button" data-dismiss="modal">Close</button>
 			                                          </div>

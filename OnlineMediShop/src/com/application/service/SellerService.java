@@ -1,9 +1,12 @@
 package com.application.service;
 
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -12,6 +15,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -20,18 +24,27 @@ import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import com.application.dao.SellerDao;
+import com.application.model.CancellationRequest;
 import com.application.model.ConfirmOrderRequest;
 import com.application.model.DeliverOrderRequest;
+import com.application.model.Order;
+import com.application.model.OrderStatus;
+import com.application.model.OrderWrapper;
+import com.application.model.RefundOrder;
 import com.application.model.Seller;
 import com.application.model.User;
 import com.application.utility.OrderUtility;
 import com.application.utility.SpringPropertiesUtil;
+import com.opensymphony.xwork2.util.TextUtils;
 
 public class SellerService extends  BaseService implements SellerDao {
 	
 	private static final Logger logger = LoggerFactory.getLogger(SellerService.class);
+	@Autowired
+	SimpleDateFormat sdf;
 	
 	private JdbcTemplate template;
 	public void setTemplate(JdbcTemplate template) {  
@@ -78,6 +91,9 @@ public class SellerService extends  BaseService implements SellerDao {
 					sellerObj.setSellerMobileNo(rs.getString("seller_mobileno"));
 					sellerObj.setTaxType(rs.getString("seller_tax_type"));
 					sellerObj.setTaxCategory(rs.getString("seller_tax_category"));
+					sellerObj.setSellerShopCloseDay(rs.getString("seller_shop_close_day"));
+					sellerObj.setShopCloseTime(rs.getString("seller_shop_open_time"));
+					sellerObj.setShopOpenTime(rs.getString("seller_shop_close_time"));
 					list.add(sellerObj);  
 				}  
 				return list;  
@@ -194,5 +210,308 @@ public class SellerService extends  BaseService implements SellerDao {
 		final String query = strBuilder.toString();
 		updateStatus = template.update(query);
 		return updateStatus;
+	}
+
+	@Override
+	public List<List<Object>> getSellsReport(String sellerId, long fromDate,
+			long toDate) {
+
+		String	strQuery = "SELECT count(*) as 'order_count', a.order_status"
+		+" FROM `medishop`.`order` as a, `medishop`.`refun_order` b"
+		+" where a.order_seller_id = '"+sellerId+"'"
+		+" and a.order_create_date between '"+sdf.format(fromDate) +"' and '"+ sdf.format(toDate) + "'"
+		+" and  a.order_id not in (SELECT aa.order_id"
+		+" FROM `medishop`.`refun_order` as aa,`medishop`.`order` bb"
+		+" where aa.order_id = bb.order_id"
+		+" and bb.order_seller_id = '"+sellerId+"'"
+		+" and aa.refund_initiate_time between '"+sdf.format(fromDate) +"' and '"+ sdf.format(toDate) + "')"
+		+" group by a.order_status";
+		logger.info("Get Sells Order Report Query : "+strQuery);
+		
+		List<List<Object>> finalDataList = new ArrayList<List<Object>>();
+		List<List<Object>> mainDataList = new ArrayList<List<Object>>();
+		List<Object> datalist =new ArrayList<Object>();
+		datalist.add("Task");
+		datalist.add("Sell Details");
+		finalDataList.add(datalist);
+		final String query = strQuery;
+		
+		mainDataList =  (List<List<Object>>) template.query(query,new ResultSetExtractor<List<List<Object>>>(){  
+			public List<List<Object>> extractData(ResultSet rs) throws SQLException,  
+				DataAccessException {  
+				List<List<Object>> data=new ArrayList<List<Object>>();  
+				while(rs.next()){  
+					List<Object> dataList =new ArrayList<Object>();
+					dataList.add(String.valueOf(rs.getString("order_status")));
+					dataList.add(rs.getInt("order_count"));
+					data.add(dataList);					
+				}  
+				return data;  
+			}  
+		});
+		
+		for(List<Object> data : mainDataList){
+			finalDataList.add(data);
+		}
+		
+		strQuery = "SELECT count(*) as 'refund_order_count', a.refund_status"
+					+" FROM `medishop`.`refun_order` as a,`medishop`.`order` b"
+					+" where a.order_id = b.order_id"
+					+" and b.order_seller_id = '"+sellerId+"'"
+					+" and a.refund_initiate_time between '"+sdf.format(fromDate) +"' and '"+ sdf.format(toDate) + "'"
+					+" group by a.refund_status";
+		
+		logger.info("Get Sells Refud Query : "+strQuery);
+		final String queryStr = strQuery;
+				
+		mainDataList =  (List<List<Object>>) template.query(queryStr,new ResultSetExtractor<List<List<Object>>>(){  
+			public List<List<Object>> extractData(ResultSet rs) throws SQLException,  
+				DataAccessException {  
+				List<List<Object>> data=new ArrayList<List<Object>>();  
+				while(rs.next()){  
+					List<Object> dataList =new ArrayList<Object>();
+					dataList.add(String.valueOf(rs.getString("refund_status")));
+					dataList.add(rs.getInt("refund_order_count"));
+					data.add(dataList);					
+				}  
+				return data;  
+			}  
+		});
+		
+		for(List<Object> data : mainDataList){
+			finalDataList.add(data);
+		}
+		return finalDataList;
+	}
+	
+	public Map<String,List<Object>> generateSellerReport(String sellerId, long fromDate, long toDate){
+		
+		Map<String,List<Object>> dataMap = new HashMap<String,List<Object>>();
+		
+		final String getOrderQuery = "SELECT * "
+				+" FROM `medishop`.`order` as a, `medishop`.`refun_order` b"
+				+" where a.order_seller_id = '"+sellerId+"'"
+				+" and a.order_create_date between '"+sdf.format(fromDate) +"' and '"+ sdf.format(toDate) + "'"
+				+" and  a.order_id not in (SELECT aa.order_id"
+				+" FROM `medishop`.`refun_order` as aa,`medishop`.`order` bb"
+				+" where aa.order_id = bb.order_id"
+				+" and bb.order_seller_id = '"+sellerId+"'"
+				+" and aa.refund_initiate_time between '"+sdf.format(fromDate) +"' and '"+ sdf.format(toDate) + "')";
+				//+" group by a.order_status";
+		logger.info("Get Sells Order Report Query : "+getOrderQuery);
+		
+		List<Object> mainDataList = new ArrayList<Object>();
+		mainDataList =  (List<Object>) template.query(getOrderQuery,new ResultSetExtractor<List<Object>>(){  
+			public List<Object> extractData(ResultSet rs) throws SQLException,  
+				DataAccessException {  
+				List<Object> orderList=new ArrayList<Object>();  
+				while(rs.next()){  
+					Order order = new Order();
+					order.setOrderid(String.valueOf(rs.getLong("order_id")));
+					order.setOrdercreator(rs.getString("order_creator"));
+					order.setOrderCreateDate(rs.getTimestamp("order_create_date"));
+					order.setOrderdetails(rs.getString("order_details"));
+					order.setOrderstatus(rs.getString("order_status"));
+					order.setOrderprice(rs.getBigDecimal("order_price"));
+					order.setOrderlastmodify(rs.getTimestamp("order_last_modify"));
+					order.setOrderSellerId(rs.getLong("order_seller_id"));
+					order.setEmergencyFlag(rs.getInt("order_emergencyFlag"));
+					order.setShippingAddress(rs.getString("order_address"));
+					order.setEmergencyPrice(rs.getBigDecimal("order_emergency_price"));
+					order.setOrderPincode(rs.getString("order_pincode"));
+					order.setOrderDiscountAmount(rs.getBigDecimal("order_discount_amount"));
+					order.setOrderDeliveryAmount(rs.getBigDecimal("order_delivery_price"));
+					order.setCancellationCmd(rs.getString("order_cancellationcmd"));
+					orderList.add(order);					
+				}  
+				return orderList;  
+			}  
+		});
+		dataMap.put("Order", mainDataList);
+		
+		final String getRefundQuery = "SELECT * "
+				+" FROM `medishop`.`refun_order` as a,`medishop`.`order` b"
+				+" where a.order_id = b.order_id"
+				+" and b.order_seller_id = '"+sellerId+"'"
+				+" and a.refund_initiate_time between '"+sdf.format(fromDate) +"' and '"+ sdf.format(toDate) + "'";
+				//+" group by a.refund_status";
+	
+		logger.info("Get Sells Refud Query : "+getRefundQuery);
+		mainDataList = null;		
+		mainDataList =  (List<Object>) template.query(getRefundQuery,new ResultSetExtractor<List<Object>>(){  
+			public List<Object> extractData(ResultSet rs) throws SQLException,  
+				DataAccessException {  
+				List<Object> data=new ArrayList<Object>();  
+				while(rs.next()){
+					RefundOrder refundOrder = new RefundOrder();
+					refundOrder.setRefundAmount(rs.getBigDecimal("order_amount"));
+					refundOrder.setCashmemoNo(rs.getString("cashmemo_no"));
+					refundOrder.setRefunRequestNo(rs.getString("refund_request_id"));
+					refundOrder.setRefundInitiateTime(rs.getTimestamp("refund_initiate_time"));
+					refundOrder.setRefundOrderlastmodify(rs.getTimestamp("refund_detail_last_modified"));
+					refundOrder.setRefundInitiateUser(rs.getString("refund_initiate_user"));
+					refundOrder.setRefundOrderid(String.valueOf(rs.getLong("order_id")));
+					refundOrder.setRefundOrderSellerComt(rs.getString("refund_seller_comments"));
+					refundOrder.setRefundOrderStatus(rs.getString("refund_status"));
+					refundOrder.setRefundReason(rs.getString("refund_reason"));
+					refundOrder.setSellerId(String.valueOf(rs.getLong("order_seller_id")));
+					refundOrder.setInitiatorAddress(rs.getString("order_address").concat(". Pincode: "+rs.getString("order_pincode")));
+					data.add(refundOrder);
+				}  
+				return data;  
+			}  
+		});
+		dataMap.put("RefundOrder", mainDataList);
+		mainDataList = null;
+		return dataMap;
+	}
+
+	@Override
+	public List<CancellationRequest> getCancelRequest(String requester,
+			long fromDate, long toDate,String searchType,User user,List<String> cancelRequestIdList,List<String> cancelRequestStatusList) {
+		StringBuffer strBuff = new StringBuffer();
+		sdf =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		if(fromDate == 0 || toDate == 0){
+			toDate = System.currentTimeMillis();
+			fromDate = (toDate - Long.valueOf(SpringPropertiesUtil.getProperty("CancellationRequest.DAY.DIFFR")));
+		}
+		
+		if(searchType.equalsIgnoreCase("simple")){
+			if(user.getUser_role().equalsIgnoreCase(SpringPropertiesUtil.getProperty("user.seller"))){
+				strBuff.append("select * from medishop.order_cancel_request where (cancel_requester = '"+requester+"')");
+				strBuff.append(" and (cancel_requested_date between '"+sdf.format(fromDate) +"' and '"+ sdf.format(toDate) + "')");
+			}
+			else if(user.getUser_role().equalsIgnoreCase(SpringPropertiesUtil.getProperty("user.admin"))){
+				strBuff.append("select * from medishop.order_cancel_request ");
+				strBuff.append(" where (cancel_requested_date between '"+sdf.format(fromDate) +"' and '"+ sdf.format(toDate) + "')");
+			}
+			strBuff.append(" order by cancel_requested_date desc ");			
+			
+		}
+		else if(searchType.equalsIgnoreCase("advance")){
+			if(user.getUser_role().equalsIgnoreCase(SpringPropertiesUtil.getProperty("user.seller"))){
+				strBuff.append("select * from medishop.order_cancel_request where (cancel_requester = '"+requester+"')");
+				strBuff.append(" and (cancellation_request_status in ('"+TextUtils.join("','", cancelRequestStatusList)+"'))");
+			}
+			else if(user.getUser_role().equalsIgnoreCase(SpringPropertiesUtil.getProperty("user.admin"))){
+				strBuff.append("select * from medishop.order_cancel_request ");
+				strBuff.append(" where (cancellation_request_status in ('"+TextUtils.join("','", cancelRequestStatusList)+"'))");
+			}
+			
+			if(cancelRequestIdList != null && cancelRequestIdList.size()>0){
+				strBuff.append(" and cancel_request_id in ('"+TextUtils.join("','", cancelRequestIdList)+"')");
+			}
+			else{
+				strBuff.append(" and (cancel_requested_date between '"+sdf.format(fromDate) +"' and '"+ sdf.format(toDate) + "')");
+			}
+			strBuff.append(" order by cancel_requested_date desc");
+		}
+		final String query = strBuff.toString();
+		logger.info("Executing Method getCancelRequest(). Query : "+query);
+		
+		return (List<CancellationRequest>) template.query(query,new ResultSetExtractor<List<CancellationRequest>>(){  
+			public List<CancellationRequest> extractData(ResultSet rs) throws SQLException,  
+				DataAccessException {  
+				List<CancellationRequest> list = new ArrayList<CancellationRequest>();  
+				while(rs.next()){  
+					CancellationRequest cancelOrderRequestObj=new CancellationRequest();
+					cancelOrderRequestObj.setOrderid(String.valueOf(rs.getLong("order_id")));
+					cancelOrderRequestObj.setCancellationRequestId(rs.getString("cancel_request_id"));
+					cancelOrderRequestObj.setRequestInitiateTime(rs.getTimestamp("cancel_requested_date"));
+					cancelOrderRequestObj.setLastModifiedTime(rs.getTimestamp("request_last_update"));
+					cancelOrderRequestObj.setRequestStatus(rs.getString("cancellation_request_status"));
+					cancelOrderRequestObj.setRequestReason(rs.getString("cancellation_reason"));
+					cancelOrderRequestObj.setInitiateUser(rs.getString("cancel_requester"));
+					cancelOrderRequestObj.setRefundRequestId(rs.getString("order_id"));
+					cancelOrderRequestObj.setRequestApproverId(rs.getString("cancel_request_approver"));
+					cancelOrderRequestObj.setRequestedHostIP(rs.getString("request_Ip_address"));
+					list.add(cancelOrderRequestObj);
+				}  
+				return list;  
+			}  
+		});
+	}
+
+	@Override
+	public Map<String, Integer> getOrderCount(String sellerId, long fromDate,
+			long toDate) {
+		// TODO Auto-generated method stub
+		
+		/*final String orderQuery = "SELECT count(*) as 'order_count', a.order_status"
+				+" FROM `medishop`.`order` as a, `medishop`.`refun_order` b"
+				+" where a.order_seller_id = '"+sellerId+"'"
+				+" and a.order_create_date between '"+sdf.format(fromDate) +"' and '"+ sdf.format(toDate) + "'"
+				+" and  a.order_id not in (SELECT aa.order_id"
+				+" FROM `medishop`.`refun_order` as aa,`medishop`.`order` bb"
+				+" where aa.order_id = bb.order_id"
+				+" and bb.order_seller_id = '"+sellerId+"')"
+				//+" and aa.refund_initiate_time between '"+sdf.format(fromDate) +"' and '"+ sdf.format(toDate) + "')"
+				+" group by a.order_status";*/
+		
+		final String orderQuery = "SELECT count(*) as 'order_count', a.order_status FROM `medishop`.`order` as a, `medishop`.`refun_order` b where a.order_seller_id = '1000' and a.order_create_date between '2015-09-15 10:33:26' and '2017-10-15 10:33:26' and  a.order_id not in (SELECT aa.order_id FROM `medishop`.`refun_order` as aa,`medishop`.`order` bb where aa.order_id = bb.order_id and bb.order_seller_id = '1000') group by a.order_status";
+		logger.info("Get Sells Order Report Query : "+orderQuery);
+		
+		Map<String, Integer> dataMap = new HashMap<String, Integer>();
+		Map<String, Integer> finalDataMap = new HashMap<String, Integer>();		
+		
+		dataMap =  (Map<String, Integer>) template.query(orderQuery,new ResultSetExtractor<Map<String, Integer>>(){  
+			public Map<String, Integer> extractData(ResultSet rs) throws SQLException,  
+				DataAccessException {  
+				Map<String, Integer> data=new HashMap<String, Integer>();  
+				while(rs.next()){
+					String status = "";
+					if(rs.getString("order_status").equalsIgnoreCase(SpringPropertiesUtil.getProperty("pending"))){
+						status = "ORDER_PENDING";
+					}
+					else if(rs.getString("order_status").equalsIgnoreCase(SpringPropertiesUtil.getProperty("confirm"))){
+						status = "ORDER_CONFIRM";
+					}
+					else if(rs.getString("order_status").equalsIgnoreCase(SpringPropertiesUtil.getProperty("canel"))){
+						status = "ORDER_CANCEL";
+					}
+					else if(rs.getString("order_status").equalsIgnoreCase(SpringPropertiesUtil.getProperty("deliver"))){
+						status = "ORDER_DELIVER";					
+					}
+					data.put(status, rs.getInt("order_count"));
+				}  
+				return data;  
+			}  
+		});
+		finalDataMap.putAll(dataMap);
+		
+		/*final String refundOrderQuery = "SELECT count(*) as 'refund_order_count', a.refund_status"
+				+" FROM `medishop`.`refun_order` as a,`medishop`.`order` b"
+				+" where a.order_id = b.order_id"
+				+" and b.order_seller_id = '"+sellerId+"'"
+				+" and a.refund_initiate_time between '"+sdf.format(fromDate) +"' and '"+ sdf.format(toDate) + "'"
+				+" group by a.refund_status";*/
+		final String refundOrderQuery = "SELECT count(*) as 'refund_order_count', a.refund_status FROM `medishop`.`refun_order` as a,`medishop`.`order` b where a.order_id = b.order_id and b.order_seller_id = '1000' and a.refund_initiate_time between '2015-09-15 10:33:26' and '2017-10-15 10:33:26' group by a.refund_status";
+		logger.info("Get Sells Refud Query : "+refundOrderQuery);
+				
+		dataMap =  (Map<String, Integer>) template.query(refundOrderQuery,new ResultSetExtractor<Map<String, Integer>>(){  
+			public Map<String, Integer> extractData(ResultSet rs) throws SQLException,  
+				DataAccessException {  
+				Map<String, Integer> data=new HashMap<String, Integer>();  
+				while(rs.next()){  
+					String status = "";
+					if(rs.getString("refund_status").equalsIgnoreCase(SpringPropertiesUtil.getProperty("pending"))){
+						status = "REFUND_PENDING";
+					}
+					else if(rs.getString("refund_status").equalsIgnoreCase(SpringPropertiesUtil.getProperty("confirm"))){
+						status = "REFUND_CONFIRM";
+					}
+					else if(rs.getString("refund_status").equalsIgnoreCase(SpringPropertiesUtil.getProperty("canel"))){
+						status = "REFUND_CANCEL";
+					}
+					else if(rs.getString("refund_status").equalsIgnoreCase(SpringPropertiesUtil.getProperty("approve"))){
+						status = "REFUND_REFUNDED";					
+					}	
+					data.put(status, rs.getInt("refund_order_count"));
+				}  
+				return data;  
+			}  
+		});
+		finalDataMap.putAll(dataMap);
+		return finalDataMap;
 	}
 }

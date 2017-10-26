@@ -103,4 +103,10 @@ public class RefundOrderRequest {
 	public void setRefundAmount(double refundAmount) {
 		this.refundAmount = refundAmount;
 	}
+	
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return "{\"refundOrderid\":\""+refundOrderid+"\",\"refundOrderStatus\":\""+refundOrderStatus+"\",\"refundRequestId\":\""+refundRequestId+"\",\"sellerComments\":\""+sellerComments+"\"}";
+	}
 }

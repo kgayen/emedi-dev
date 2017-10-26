@@ -48,4 +48,9 @@ public class SearchRefundOrder {
 		this.refundOrderStatusList = refundOrderStatusList;
 	}
 	
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return "{refundSearchType : "+refundSearchType+",fromDate : "+fromDate+",toDate : "+toDate+",userId : "+userId+"}";
+	}
 }

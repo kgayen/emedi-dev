@@ -60,12 +60,12 @@
 	    <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
 	    <property name="locations">
 	    <list>
-	        <value>file:///D:/Drive_Project/textworkspace/OnlineMediShop/build/classes/errorTable.properties</value>
-	        <value>file:///D:/Drive_Project/textworkspace/OnlineMediShop/build/classes/notification.properties</value>
-	        <value>file:///D:/Drive_Project/textworkspace/OnlineMediShop/build/classes/tablename.properties</value>
-	        <value>file:///D:/Drive_Project/textworkspace/OnlineMediShop/build/classes/loggeractivity.properties</value>
-	        <value>file:///D:/Drive_Project/textworkspace/OnlineMediShop/build/classes/application.properties</value>
-	        <value>file:///D:/Drive_Project/textworkspace/OnlineMediShop/build/classes/SMS.properties</value>
+	        <value>file:///C:/Users/KAUSTAV/git/emedi-dev/OnlineMediShop/build/classes/errorTable.properties</value>
+			<value>file:///C:/Users/KAUSTAV/git/emedi-dev/OnlineMediShop/build/classes/notification.properties</value>
+			<value>file:///C:/Users/KAUSTAV/git/emedi-dev/OnlineMediShop/build/classes/tablename.properties</value>
+			<value>file:///C:/Users/KAUSTAV/git/emedi-dev/OnlineMediShop/build/classes/loggeractivity.properties</value>
+			<value>file:///C:/Users/KAUSTAV/git/emedi-dev/OnlineMediShop/build/classes/application.properties</value>
+			<value>file:///C:/Users/KAUSTAV/git/emedi-dev/OnlineMediShop/build/classes/SMS.properties</value>
 	        
 	        
 <!-- 	        <value>file:///opt/shared/configuration/medishopproperties/errorTable.properties</value> -->

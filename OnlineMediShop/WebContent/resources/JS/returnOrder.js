@@ -154,6 +154,7 @@ $( document ).ready(function() {
 	
 	$("#refundorderSearchByAdvance").click(function(){
 		var optionValue = $("input[name='option']:checked").val();
+		var searchForm = $("#refundorderSearchByAdvance").val();
 		if(optionValue == undefined || optionValue == "" || optionValue == null){
 			$('#refundadvanceErrorMessageSpan').html("Please, choose one option.").show();
 			$('#refundadvanceErrorMessage').show();
@@ -194,7 +195,13 @@ $( document ).ready(function() {
 					}
 					else{
 						//loadRefundOrders("ByAdvanceSearch",fromDate,toDate,null,statusValuesArray,new Array("refundByDateOtion"));
-						loadRefundOrders("",optionValue,fromDate,toDate,null,statusValuesArray);
+						if(searchForm == "CustomerSearch"){
+							loadRefundOrders("",optionValue,fromDate,toDate,null,statusValuesArray);
+						}
+						else if(searchForm == "SellerSearch"){
+							loadSellerRefundOrders("",optionValue,fromDate,toDate,null,statusValuesArray);
+						}
+						
 						setTimeout(function () {
 							$('#successModifiedErrorAlert').hide();
 						},3000);
@@ -210,14 +217,14 @@ $( document ).ready(function() {
 						orderIdList = orderIdList.substring(0,orderIdList.length-1);
 					}
 					var checkCharFlag = true;
-					var eventValue = "";
+					/*var eventValue = "";
 					for(var i=0;i<orderIdList.length;i++){
 						eventValue = orderIdList.charAt(i);
 						if (eventValue != ',' && !(/[0-9]/.test(eventValue))) {
 							checkCharFlag = false;
 							i = orderIdList.length;
 						}
-					}
+					}*/
 					if(!checkCharFlag){
 						$('#refundadvanceErrorMessageSpan').html("<b>"+eventValue + " </b>is invalid character to search. Please use comma as a separator.");
 						$('#refundadvanceErrorMessage').show();
@@ -228,7 +235,13 @@ $( document ).ready(function() {
 					}
 					if(checkCharFlag){
 						orderIdList = orderIdList.split(",");
-						//loadRefundOrders("ByAdvanceSearch",null,null,orderIdList,statusValuesArray,new Array("refundByOrderIdOtion"));
+						alert(searchForm);
+						if(searchForm == "CustomerSearch"){
+							loadRefundOrders("",optionValue,null,null,orderIdList,statusValuesArray);
+						}
+						else if(searchForm == "SellerSearch"){
+							loadSellerRefundOrders("",optionValue,null,null,orderIdList,statusValuesArray);
+						}
 						setTimeout(function () {
 							$('#successModifiedErrorAlert').hide();
 						},3000);
@@ -340,7 +353,7 @@ function loadRefundOrders(userid,loadRefundOrders,fromDate,toDate,refundOrderIdL
 						$('#successModifiedErrorAlert').hide();
 					},3000);
 				}
-				else if(data["refundOrders"].length>0){
+				else if(data.hasOwnProperty("refundOrders")){
 							var htmlFile = '<header class="panel-heading"> Refund Orders </header><table id="refund_order_Search_Table" class="table table-striped table-advance table-hover"> <thead> <tr> <th><i class="fa fa-hashtag" aria-hidden="true"></i> Request ID</th><th><i class="icon_calendar"></i> Initated Date</th><th><i class="fa fa-dot-circle-o"></i> Status</th> <th><i class="fa fa-inr"></i> Refund Amount</th><th><i class="fa fa-check-square-o"></i> Refund Order Id</th> <th><i class="fa fa-check-square"></i> Cash Memo No.</th> <th><i class="icon_cogs"></i> Action</th> </tr> </thead> <tbody>';
 							var refundOrderObjectList = data.refundOrders;
 							for(var key = 0; key<refundOrderObjectList.length;key++){

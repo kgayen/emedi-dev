@@ -38,8 +38,28 @@ public class SellerActivitiesController {
 		return new ModelAndView("processrefund");
     }
 	
+	@RequestMapping(value = "/confirmedrefund", method = RequestMethod.GET)
+    public ModelAndView processConfirmedRefundPage() {
+		return new ModelAndView("confirmedrefund");
+    }
+	
+	@RequestMapping(value = "/cancelledrefund", method = RequestMethod.GET)
+    public ModelAndView processCancelledRefundPage() {
+		return new ModelAndView("cancelledrefund");
+    }
+	
+	@RequestMapping(value = "/refundedrefund", method = RequestMethod.GET)
+    public ModelAndView processRefundedRefundPage() {
+		return new ModelAndView("refundedrefund");
+    }
+	
 	@RequestMapping(value = "/searchorder", method = RequestMethod.GET)
     public ModelAndView searchorderPage() {
 		return new ModelAndView("sellerSearchView");
+    }
+	
+	@RequestMapping(value = "/raisecancelrequest", method = RequestMethod.GET)
+    public ModelAndView getSellerCancelRequest() {
+		return new ModelAndView("cancelrequest");
     }
 }

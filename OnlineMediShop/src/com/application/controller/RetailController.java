@@ -11,8 +11,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.application.model.Seller;
 import com.application.model.User;
+import com.application.service.SellerService;
 import com.application.service.UserService;
+import com.application.utility.SpringPropertiesUtil;
 
 @Controller
 @RequestMapping(value = "/retail")
@@ -20,6 +23,8 @@ public class RetailController {
 	
 	@Autowired
 	UserService userService;
+	@Autowired
+	SellerService sellerService;
 	
 	@RequestMapping(value = "/placeorder", method = RequestMethod.GET)
     public String getPlaceOrderPage() {
@@ -59,11 +64,29 @@ public class RetailController {
 		user.setUser_password(userPassword);
 		List<User> status= (List<User>) userService.getDataList(user);
 		if(status.size()>0){
-			req.getSession().setAttribute("user", status.get(0));
-			if(status.get(0).getUser_role().equalsIgnoreCase("seller") || status.get(0).getUser_role().equalsIgnoreCase("admin")){
+			if(status.get(0).getUser_role().equalsIgnoreCase("seller")){
+				List<Seller> sellers = sellerService.getSeller("getSellerById", status.get(0).getUser_id());
+				Seller sellerInfo = sellers.get(0);
+				if(sellerInfo.getSellerStatus().equalsIgnoreCase("Active")){
+					req.getSession().setAttribute("user", status.get(0));
+					return "redirect:/seller/sellerdashboard";
+				}
+				else{
+					req.setAttribute("logginmsg", SpringPropertiesUtil.getProperty("seller.inactive"));
+					//return "redirect:/retail/login";
+					return "login";
+				}
+				
+			}
+			else if(status.get(0).getUser_role().equalsIgnoreCase("admin")){
+				req.getSession().setAttribute("user", status.get(0));
 				return "redirect:/seller/sellerdashboard";
 			}
-			return "redirect:/user/placeorder";
+			else if(status.get(0).getUser_role().equalsIgnoreCase("customer")){
+				req.getSession().setAttribute("user", status.get(0));
+				return "redirect:/user/placeorder";
+			}
+			return "login";
 		}
 		else{
 			return "login";
